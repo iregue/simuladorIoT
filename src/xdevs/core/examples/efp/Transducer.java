@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
 
 /**
@@ -38,12 +39,12 @@ public class Transducer extends Atomic {
 
     private static final Logger LOGGER = Logger.getLogger(Transducer.class.getName());
 
-    protected Port<Job> iArrived = new Port<>("iArrived");
-    protected Port<Job> iSolved = new Port<>("iSolved");
-    protected Port<Job> oOut = new Port<>("oOut");
+    protected Port<Input> iArrived = new Port<>("iArrived");
+    protected Port<Input> iSolved = new Port<>("iSolved");
+    protected Port<Input> oOut = new Port<>("oOut");
 
-    protected LinkedList<Job> jobsArrived = new LinkedList<>();
-    protected LinkedList<Job> jobsSolved = new LinkedList<>();
+    protected LinkedList<Input> jobsArrived = new LinkedList<>();
+    protected LinkedList<Input> jobsSolved = new LinkedList<>();
     protected double observationTime;
     protected double totalTa;
     protected double clock;
@@ -60,9 +61,9 @@ public class Transducer extends Atomic {
 
     public Transducer(Element xmlAtomic) {
         super(xmlAtomic);
-        iArrived = (Port<Job>) super.getInPort(iArrived.getName());
-        iSolved = (Port<Job>) super.getInPort(iSolved.getName());
-        oOut = (Port<Job>) super.getOutPort(oOut.getName());  
+        iArrived = (Port<Input>) super.getInPort(iArrived.getName());
+        iSolved = (Port<Input>) super.getInPort(iSolved.getName());
+        oOut = (Port<Input>) super.getOutPort(oOut.getName());  
         NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
         Element xmlParameter = (Element)xmlParameters.item(0);
         totalTa = 0;
@@ -112,19 +113,19 @@ public class Transducer extends Atomic {
     public void deltext(double e) {
         clock = clock + e;
         if (phaseIs("active")) {
-            Job job = null;
+            Input input = null;
             if (!iArrived.isEmpty()) {
-                job = iArrived.getSingleValue();
-                LOGGER.fine("Start job " + job.id + " @ t = " + clock);
-                job.time = clock;
-                jobsArrived.add(job);
+            	input = iArrived.getSingleValue();
+                LOGGER.fine("Start job " + input.getRadiacion() + " @ t = " + clock);
+                input.setRadiacion(clock);
+                jobsArrived.add(input);
             }
             if (!iSolved.isEmpty()) {
-                job = iSolved.getSingleValue();
-                totalTa += (clock - job.time);
-                LOGGER.fine("Finish job " + job.id + " @ t = " + clock);
-                job.time = clock;
-                jobsSolved.add(job);
+            	input = iSolved.getSingleValue();
+                totalTa += (clock + input.getRadiacion());
+                LOGGER.fine("Finish job " + input.getRadiacion() + " @ t = " + clock);
+                input.setRadiacion(clock);
+                jobsSolved.add(input);
             }
         }
         //logger.info("###Deltext: "+showState());
@@ -133,8 +134,8 @@ public class Transducer extends Atomic {
     @Override
     public void lambda() {
         if (phaseIs("done")) {
-            Job job = new Job("null");
-            oOut.addValue(job);
+            Input input = new Input(0.0);
+            oOut.addValue(input);
         }
     }
 }

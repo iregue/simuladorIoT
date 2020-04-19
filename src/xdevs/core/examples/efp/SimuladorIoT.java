@@ -21,33 +21,37 @@
  */
 package xdevs.core.examples.efp;
 
+import java.util.ArrayList;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import xdevs.core.modeling.Atomic;
+import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
 
 /**
  *
  * @author jlrisco
  */
-public class Processor extends Atomic {
+public class SimuladorIoT extends Atomic {
 
-    protected Port<Job> iIn = new Port<>("iIn");
-    protected Port<Job> oOut = new Port<>("oOut");
-    protected Job currentJob = null;
+    protected Port<Input> iIn = new Port<>("iIn");
+    protected Port<Input> oOut = new Port<>("oOut");
+    protected Input currentInput = null;
     protected double processingTime;
+    protected ArrayList<Double> listaInputs = new ArrayList<Double>();
 
-    public Processor(String name, double processingTime) {
+    public SimuladorIoT(String name, double processingTime) {
         super(name);
         super.addInPort(iIn);
         super.addOutPort(oOut);
         this.processingTime = processingTime;
     }
 
-    public Processor(Element xmlAtomic) {
+    public SimuladorIoT(Element xmlAtomic) {
         super(xmlAtomic);
-        iIn = (Port<Job>) super.getInPort(iIn.getName());
-        oOut = (Port<Job>) super.getOutPort(oOut.getName());
+        iIn = (Port<Input>) super.getInPort(iIn.getName());
+        oOut = (Port<Input>) super.getOutPort(oOut.getName());
         NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
         Element xmlParameter = (Element)xmlParameters.item(0);
         processingTime = Double.valueOf(xmlParameter.getAttribute("value"));
@@ -70,22 +74,19 @@ public class Processor extends Atomic {
     @Override
     public void deltext(double e) {
         if (super.phaseIs("passive")) {
-            currentJob = iIn.getSingleValue();
+            currentInput = iIn.getSingleValue();
             super.holdIn("active", processingTime);
-            System.out.println("PreCambio" + currentJob.toString());
+            System.out.println("PreCambio" + currentInput.toString());
             
-            currentJob.input.setEnergia(currentJob.input.getEnergia() + 1.0);
-            currentJob.input.setVelocidad(currentJob.input.getVelocidad() * 2.0);
-            currentJob.input.setRadiacion(currentJob.input.getRadiacion() / 2.0);
+            currentInput.setRadiacion(currentInput.getRadiacion() / 2.0);
             
-
-            System.out.println("PostCambios: "+ currentJob.toString());
+            //System.out.println("PostCambios: "+ currentInput.toString());
 
         }
     }
 
     @Override
     public void lambda() {
-        oOut.addValue(currentJob);
+        oOut.addValue(currentInput);
     }
 }

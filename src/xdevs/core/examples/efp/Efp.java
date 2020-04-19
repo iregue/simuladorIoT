@@ -42,7 +42,7 @@ public class Efp extends Coupled {
 
         Ef ef = new Ef("ef", generatorPeriod, transducerPeriod);
         super.addComponent(ef);
-        Processor processor = new Processor("processor", processorPeriod);
+        SimuladorIoT processor = new SimuladorIoT("processor", processorPeriod);
         super.addComponent(processor);
 
         super.addCoupling(ef.oOut, processor.iIn);

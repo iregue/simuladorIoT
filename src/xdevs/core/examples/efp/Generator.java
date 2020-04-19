@@ -38,9 +38,9 @@ import java.io.IOException;
  * to the source code implemented by Saurabh, a iStart input port must be added.
  */
 public class Generator extends Atomic {
-    protected Port<Job> iStart = new Port<>("iStart");
-    protected Port<Job> iStop = new Port<>("iStop");
-    protected Port<Job> oOut = new Port<>("oOut");
+    protected Port<Input> iStart = new Port<>("iStart");
+    protected Port<Input> iStop = new Port<>("iStop");
+    protected Port<Input> oOut = new Port<>("oOut");
     protected int jobCounter;
     protected double period;
     protected ArrayList<Input> listaEntrada = new ArrayList<Input>();
@@ -55,13 +55,18 @@ public class Generator extends Atomic {
         
         BufferedReader reader;
 		try {
+			//TODO: Recorrer ficheros de un directorio
 			reader = new BufferedReader(new FileReader(
-					"/home/iregueiro/Documentos/universidad/DATA.csv"));
+					"/home/iregueiro/Documentos/universidad/xdevs/dh5/20100520_dh5.csv"));
 			String line = reader.readLine();
+			if(line != null) {
+				line = reader.readLine(); //Salta la primera linea
+			}
 			while (line != null) {
-				System.out.println(line);
-				String[] arrOfStr = line.split(",", 3);
-				Input datosEntrada = new Input(Double.parseDouble(arrOfStr[0]),Double.parseDouble(arrOfStr[1]),Double.parseDouble(arrOfStr[2]));
+				//System.out.println(line);
+				String[] arrOfStr = line.split(",");
+				//System.out.println(arrOfStr[1]);
+				Input datosEntrada = new Input(Double.parseDouble(arrOfStr[1]));
 				listaEntrada.add(datosEntrada);
 				
 				// read next line
@@ -78,9 +83,9 @@ public class Generator extends Atomic {
     
     public Generator(Element xmlAtomic) {
         super(xmlAtomic);
-        iStart = (Port<Job>) super.getInPort(iStart.getName());
-        iStop = (Port<Job>) super.getInPort(iStop.getName());
-        oOut = (Port<Job>) super.getOutPort(oOut.getName());  
+        iStart = (Port<Input>) super.getInPort(iStart.getName());
+        iStop = (Port<Input>) super.getInPort(iStop.getName());
+        oOut = (Port<Input>) super.getOutPort(oOut.getName());  
         NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
         Element xmlParameter = (Element)xmlParameters.item(0);
         period = Double.valueOf(xmlParameter.getAttribute("value"));
@@ -109,18 +114,16 @@ public class Generator extends Atomic {
 
     @Override
     public void lambda() {
-    	Job job;
+    	Input input = null;
     	if(contador < listaEntrada.size()) {
-    		Input input = (Input) listaEntrada.get(contador);
+    		input = (Input) listaEntrada.get(contador);
     		//System.out.println(input.toString());
     		contador++;
-            job = new Job("" + jobCounter + "", input);
     	}
     	else {
-            job = new Job("" + jobCounter + "");
-
+    		input = null;
     	}
-        oOut.addValue(job);
+        oOut.addValue(input);
     }
 
 	@Override

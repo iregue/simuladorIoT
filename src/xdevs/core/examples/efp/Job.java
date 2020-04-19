@@ -47,7 +47,7 @@ public class Job {
   public String toString() {
 	  System.out.println("input value: " + input);
 	  if(input != null) {
-		  return "(id,t,energia,velocidad,radiacion)=(" + id + ", " + time + ", " + input.getEnergia() + ", " + input.getVelocidad() + ", " + input.getRadiacion() + ")";
+		  return "(id,t,energia,velocidad,radiacion)=(" + id + ", " + time + ")";
 	  }
       return "(id,t)=(" + id + "," + time + ")";
   }

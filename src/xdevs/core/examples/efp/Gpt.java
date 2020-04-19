@@ -21,9 +21,11 @@
  */
 package xdevs.core.examples.efp;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import xdevs.core.modeling.Coupled;
+import xdevs.core.modeling.Input;
 import xdevs.core.simulation.Coordinator;
 import xdevs.core.util.DevsLogger;
 
@@ -37,14 +39,35 @@ public class Gpt extends Coupled {
     	super(name);
         Generator generator = new Generator("generator", period);
         super.addComponent(generator);
-        Processor processor = new Processor("processor", 3*period);
-        super.addComponent(processor);
+        ArrayList<SimuladorIoT> simulator_list = new ArrayList<SimuladorIoT>();
+    	SimuladorIoT simulator = new SimuladorIoT("simulador1", 3*period);
+        super.addComponent(simulator);
+
+        /*
+        for(int i =0; i <100; i++) {
+        	String simulador_id = "simulator_" + i;
+        	SimuladorIoT simulator = new SimuladorIoT(simulador_id, 3*period);
+            super.addComponent(simulator);
+            simulator_list.add(simulator);
+            super.addCoupling(generator.oOut, simulator.iIn);
+            //super.addCoupling(simulator.oOut, transducer.iSolved);
+
+        }
+        */
+        //SimuladorIoT simulator = new SimuladorIoT("simulator", 3*period);
+        //super.addComponent(simulator);
         Transducer transducer = new Transducer("transducer", observationTime);
         super.addComponent(transducer);
         
-        super.addCoupling(generator.oOut, processor.iIn);
+        super.addCoupling(generator.oOut, simulator.iIn);
+        super.addCoupling(simulator.oOut, transducer.iSolved);
+        /*
         super.addCoupling(generator.oOut, transducer.iArrived);
-        super.addCoupling(processor.oOut, transducer.iSolved);
+        for(int i =0; i <100; i++) {
+        	SimuladorIoT simulator = simulator_list.get(i);
+        	super.addCoupling(simulator.oOut, transducer.iSolved);
+        }
+        */
         super.addCoupling(transducer.oOut, generator.iStop);
     }
 
