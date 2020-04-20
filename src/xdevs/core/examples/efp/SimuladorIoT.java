@@ -22,9 +22,11 @@
 package xdevs.core.examples.efp;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
@@ -77,7 +79,7 @@ public class SimuladorIoT extends Atomic {
             currentInput = iIn.getSingleValue();
             super.holdIn("active", processingTime);
             System.out.println("PreCambio" + currentInput.toString());
-            
+            listaInputs.add(currentInput.getRadiacion());
             currentInput.setRadiacion(currentInput.getRadiacion() / 2.0);
             
             //System.out.println("PostCambios: "+ currentInput.toString());
@@ -88,5 +90,44 @@ public class SimuladorIoT extends Atomic {
     @Override
     public void lambda() {
         oOut.addValue(currentInput);
+        if(listaInputs.size() == 30) {
+        	listaInputs.add(1000.0);
+        	listaInputs.add(10.0);
+        	listaInputs.add(500.0);
+
+        	List<Double> outliers = getOutliers(listaInputs);
+        	
+        	System.out.println("Lista outliers: " + outliers);
+        }
+    }
+    
+    public static List<Double> getOutliers(List<Double> input) {
+        List<Double> output = new ArrayList<Double>();
+        List<Double> data1 = new ArrayList<Double>();
+        List<Double> data2 = new ArrayList<Double>();
+        if (input.size() % 2 == 0) {
+            data1 = input.subList(0, input.size() / 2);
+            data2 = input.subList(input.size() / 2, input.size());
+        } else {
+            data1 = input.subList(0, input.size() / 2);
+            data2 = input.subList(input.size() / 2 + 1, input.size());
+        }
+        double q1 = getMedian(data1);
+        double q3 = getMedian(data2);
+        double iqr = q3 - q1;
+        double lowerFence = q1 - 1.5 * iqr;
+        double upperFence = q3 + 1.5 * iqr;
+        for (int i = 0; i < input.size(); i++) {
+            if (input.get(i) < lowerFence || input.get(i) > upperFence)
+                output.add(input.get(i));
+        }
+        return output;
+    }
+    
+    private static double getMedian(List<Double> data) {
+        if (data.size() % 2 == 0)
+            return (data.get(data.size() / 2) + data.get(data.size() / 2 - 1)) / 2;
+        else
+            return data.get(data.size() / 2);
     }
 }
