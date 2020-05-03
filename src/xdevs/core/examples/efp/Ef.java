@@ -39,7 +39,7 @@ public class Ef extends Coupled {
     super.addInPort(iIn);
     super.addInPort(iStart);
     super.addOutPort(oOut);
-    Generator generator = new Generator("generator", period);
+    Generator generator = new Generator("generator", period, "/home/iregueiro/Documentos/universidad/xdevs/data/dh5/");
     super.addComponent(generator);
     Transducer transducer = new Transducer("transducer", observationTime);
     super.addComponent(transducer);

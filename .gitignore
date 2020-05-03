@@ -1,7 +1,7 @@
 target
 *.swp
 *.log
-dh5/
+data/
 # IntelliJ stuff
 .idea/
 xdevs.iml

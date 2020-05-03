@@ -122,9 +122,12 @@ public class Transducer extends Atomic {
             }
             if (!iSolved.isEmpty()) {
             	input = iSolved.getSingleValue();
+            	if(input != null) {
+            	//System.out.println(input.toString());
                 totalTa += (clock + input.getRadiacion());
                 LOGGER.fine("Finish job " + input.getRadiacion() + " @ t = " + clock);
                 input.setRadiacion(clock);
+            	}
                 jobsSolved.add(input);
             }
         }
@@ -134,7 +137,7 @@ public class Transducer extends Atomic {
     @Override
     public void lambda() {
         if (phaseIs("done")) {
-            Input input = new Input(0.0);
+            Input input = new Input("Date",0.0, name);
             oOut.addValue(input);
         }
     }

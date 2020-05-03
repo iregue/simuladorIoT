@@ -41,7 +41,9 @@ public class SimuladorIoT extends Atomic {
     protected Port<Input> oOut = new Port<>("oOut");
     protected Input currentInput = null;
     protected double processingTime;
-    protected ArrayList<Double> listaInputs = new ArrayList<Double>();
+    protected ArrayList<Input> listaInputs = new ArrayList<Input>();
+    protected int contadorArray = 0;
+    protected int contadorPrint = 0;
 
     public SimuladorIoT(String name, double processingTime) {
         super(name);
@@ -70,6 +72,26 @@ public class SimuladorIoT extends Atomic {
 
     @Override
     public void deltint() {
+    	List<Input> outliers = new ArrayList<Input>();
+    	if(contadorArray == 1000) {
+        	//listaInputs.add(new Input("example",1000.0,"dh5"));
+        	//listaInputs.add(new Input("example",500.0,"dh5"));
+        	//listaInputs.add(new Input("example",300.0,"dh5"));
+
+    		try {
+    			System.out.println(listaInputs.get(0).toString());
+            	outliers = getOutliers(listaInputs);
+    		}
+    		catch(Exception e) {
+    			e.printStackTrace();
+    		}
+    		if (contadorPrint == 100) {
+            	System.out.println("Lista outliers: " + outliers);
+    		}
+
+            contadorArray=0;
+            contadorPrint++;
+        }
         super.passivate();
     }
 
@@ -78,37 +100,34 @@ public class SimuladorIoT extends Atomic {
         if (super.phaseIs("passive")) {
             currentInput = iIn.getSingleValue();
             super.holdIn("active", processingTime);
+            if(currentInput != null) {
             System.out.println("PreCambio" + currentInput.toString());
-            listaInputs.add(currentInput.getRadiacion());
-            currentInput.setRadiacion(currentInput.getRadiacion() / 2.0);
-            
-            //System.out.println("PostCambios: "+ currentInput.toString());
+            //listaInputs.add(contadorArray,currentInput.getRadiacion());
+            listaInputs.add(contadorArray,currentInput);
 
+            //currentInput.setRadiacion(currentInput.getRadiacion() / 2.0);
+            contadorArray++;
+            //System.out.println("PostCambios: "+ currentInput.toString());
+            }
         }
     }
 
     @Override
     public void lambda() {
         oOut.addValue(currentInput);
-        if(listaInputs.size() == 30) {
-        	listaInputs.add(1000.0);
-        	listaInputs.add(10.0);
-        	listaInputs.add(500.0);
-
-        	List<Double> outliers = getOutliers(listaInputs);
-        	
-        	System.out.println("Lista outliers: " + outliers);
-        }
+        
     }
     
-    public static List<Double> getOutliers(List<Double> input) {
-        List<Double> output = new ArrayList<Double>();
-        List<Double> data1 = new ArrayList<Double>();
-        List<Double> data2 = new ArrayList<Double>();
+    //Calculo Outliers http://www.mathwords.com/o/outlier.htm
+    public static List<Input> getOutliers(List<Input> input) {
+        List<Input> output = new ArrayList<Input>();
+        List<Input> data1 = new ArrayList<Input>();
+        List<Input> data2 = new ArrayList<Input>();
         if (input.size() % 2 == 0) {
             data1 = input.subList(0, input.size() / 2);
             data2 = input.subList(input.size() / 2, input.size());
-        } else {
+        }
+        else {
             data1 = input.subList(0, input.size() / 2);
             data2 = input.subList(input.size() / 2 + 1, input.size());
         }
@@ -118,16 +137,17 @@ public class SimuladorIoT extends Atomic {
         double lowerFence = q1 - 1.5 * iqr;
         double upperFence = q3 + 1.5 * iqr;
         for (int i = 0; i < input.size(); i++) {
-            if (input.get(i) < lowerFence || input.get(i) > upperFence)
+        	//System.out.println(input.get(i).toString());
+            if (input.get(i).getRadiacion() < lowerFence || input.get(i).getRadiacion() > upperFence)
                 output.add(input.get(i));
         }
         return output;
     }
     
-    private static double getMedian(List<Double> data) {
+    private static double getMedian(List<Input> data) {
         if (data.size() % 2 == 0)
-            return (data.get(data.size() / 2) + data.get(data.size() / 2 - 1)) / 2;
+            return (data.get(data.size() / 2).getRadiacion() + data.get(data.size() / 2 - 1).getRadiacion()) / 2;
         else
-            return data.get(data.size() / 2);
+            return data.get(data.size() / 2).getRadiacion();
     }
 }

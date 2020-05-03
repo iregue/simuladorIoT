@@ -21,6 +21,8 @@
  */
 package xdevs.core.examples.efp;
 
+import java.nio.file.Paths;
+
 import java.util.ArrayList;
 
 import org.w3c.dom.Element;
@@ -29,6 +31,7 @@ import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -43,40 +46,54 @@ public class Generator extends Atomic {
     protected Port<Input> oOut = new Port<>("oOut");
     protected int jobCounter;
     protected double period;
+    protected String path;
     protected ArrayList<Input> listaEntrada = new ArrayList<Input>();
     int contador = 0;
 
-    public Generator(String name, double period) {
+    public Generator(String name, double period, String path) {
         super(name);
         super.addInPort(iStop);
         super.addInPort(iStart);
         super.addOutPort(oOut);
         this.period = period;
+        this.path = path;
         
         BufferedReader reader;
 		try {
 			//TODO: Recorrer ficheros de un directorio
-			reader = new BufferedReader(new FileReader(
-					"/home/iregueiro/Documentos/universidad/xdevs/dh5/20100520_dh5.csv"));
-			String line = reader.readLine();
-			if(line != null) {
-				line = reader.readLine(); //Salta la primera linea
-			}
-			while (line != null) {
-				//System.out.println(line);
-				String[] arrOfStr = line.split(",");
-				//System.out.println(arrOfStr[1]);
-				Input datosEntrada = new Input(Double.parseDouble(arrOfStr[1]));
-				listaEntrada.add(datosEntrada);
-				
-				// read next line
-				line = reader.readLine();
-			}
-			reader.close();
-		      for (Input num : listaEntrada) { 		      
-		           //System.out.println(num.toString()); 		
-		      }		
-		      } catch (IOException e) {
+			String userDirectory = Paths.get("")
+			        .toAbsolutePath()
+			        .toString();
+			
+			final File folder = new File(path);
+			for (final File fileEntry : folder.listFiles()) {
+		        if (fileEntry.isDirectory()) {
+		            continue;
+		        } 
+		        else {
+		        	System.out.println(fileEntry.getPath());
+		            reader = new BufferedReader(new FileReader(fileEntry.getPath()));
+					String line = reader.readLine();
+					if(line != null) {
+						line = reader.readLine(); //Salta la primera linea
+					}
+					while (line != null) {
+						//System.out.println(line);
+						String[] arrOfStr = line.split(",");
+						try {
+							double d = Double.parseDouble(arrOfStr[1]);
+							Input datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
+							listaEntrada.add(datosEntrada);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+						// read next line
+						line = reader.readLine();
+					}
+					reader.close();
+		        }
+		    }
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
     }
