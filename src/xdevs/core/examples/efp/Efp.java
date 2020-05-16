@@ -45,7 +45,7 @@ public class Efp extends Coupled {
         SimuladorIoT processor = new SimuladorIoT("processor", processorPeriod);
         super.addComponent(processor);
 
-        super.addCoupling(ef.oOut, processor.iIn);
+        super.addCoupling(ef.oOut, processor.iInAp1);
         super.addCoupling(processor.oOut, ef.iIn);
         super.addCoupling(this.iStart, ef.iStart);
     }

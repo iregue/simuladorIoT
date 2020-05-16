@@ -78,20 +78,20 @@ public class Gpt extends Coupled {
         super.addComponent(transducer);
         //super.addCoupling(generator.oOut, simulator.iIn);
         
-        super.addCoupling(ap1.oOut, simulator.iIn);
-        super.addCoupling(ap5.oOut, simulator.iIn);
-        super.addCoupling(ap6.oOut, simulator.iIn);
-        super.addCoupling(ap7.oOut, simulator.iIn);
-        super.addCoupling(dh1.oOut, simulator.iIn);
-        super.addCoupling(dh2.oOut, simulator.iIn);
-        super.addCoupling(dh3.oOut, simulator.iIn);
-        super.addCoupling(dh4.oOut, simulator.iIn);
-        super.addCoupling(dh5.oOut, simulator.iIn);
-        super.addCoupling(dh6.oOut, simulator.iIn);
-        super.addCoupling(dh7.oOut, simulator.iIn);
-        super.addCoupling(dh8.oOut, simulator.iIn);
-        super.addCoupling(dh9.oOut, simulator.iIn);
-        super.addCoupling(dh10.oOut, simulator.iIn);
+        super.addCoupling(ap1.oOut, simulator.iInAp1);
+        super.addCoupling(ap5.oOut, simulator.iInAp5);
+        super.addCoupling(ap6.oOut, simulator.iInAp6);
+        super.addCoupling(ap7.oOut, simulator.iInAp7);
+        super.addCoupling(dh1.oOut, simulator.iInDh1);
+        super.addCoupling(dh2.oOut, simulator.iInDh2);
+        super.addCoupling(dh3.oOut, simulator.iInDh3);
+        super.addCoupling(dh4.oOut, simulator.iInDh4);
+        super.addCoupling(dh5.oOut, simulator.iInDh5);
+        super.addCoupling(dh6.oOut, simulator.iInDh6);
+        super.addCoupling(dh7.oOut, simulator.iInDh7);
+        super.addCoupling(dh8.oOut, simulator.iInDh8);
+        super.addCoupling(dh9.oOut, simulator.iInDh9);
+        super.addCoupling(dh10.oOut, simulator.iInDh10);
 
         
         super.addCoupling(simulator.oOut, transducer.iSolved);

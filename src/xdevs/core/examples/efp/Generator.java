@@ -81,7 +81,6 @@ public class Generator extends Atomic {
 						//System.out.println(line);
 						String[] arrOfStr = line.split(",");
 						try {
-							double d = Double.parseDouble(arrOfStr[1]);
 							Input datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
 							listaEntrada.add(datosEntrada);
 					} catch (Exception e) {
