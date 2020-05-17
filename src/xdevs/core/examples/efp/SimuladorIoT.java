@@ -116,7 +116,7 @@ public class SimuladorIoT extends Atomic {
     @Override
     public void deltint() {
     	List<Input> outliers = new ArrayList<Input>();
-    	if(contadorArray >= 100000) {
+    	if(contadorArray >= 300) {
         	//listaInputs.add(new Input("example",1000.0,"dh5"));
         	//listaInputs.add(new Input("example",500.0,"dh5"));
         	//listaInputs.add(new Input("example",300.0,"dh5"));

@@ -24,6 +24,7 @@ package xdevs.core.examples.efp;
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -66,13 +67,23 @@ public class Generator extends Atomic {
 			        .toString();
 			
 			final File folder = new File(path);
+			ArrayList<String> files = new ArrayList<String>();
+			int i = 0;
 			for (final File fileEntry : folder.listFiles()) {
-		        if (fileEntry.isDirectory()) {
+				files.add(fileEntry.getPath());
+			}
+			Collections.sort(files);
+			System.out.println("Sorted: " + files.toString());
+			//for (final File fileEntry : folder.listFiles()) {
+			for (int k = 0; k < files.size(); k++) {
+
+		        if (/*fileEntry.isDirectory() && */false) {
 		            continue;
-		        } 
+		        }
 		        else {
-		        	System.out.println(fileEntry.getPath());
-		            reader = new BufferedReader(new FileReader(fileEntry.getPath()));
+		        	System.out.println(files.get(k));
+		            //reader = new BufferedReader(new FileReader(fileEntry.getPath()));
+		            reader = new BufferedReader(new FileReader(files.get(k)));
 					String line = reader.readLine();
 					if(line != null) {
 						line = reader.readLine(); //Salta la primera linea
