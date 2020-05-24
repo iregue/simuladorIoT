@@ -23,8 +23,12 @@ package xdevs.core.examples.efp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.BufferedWriter;
 import java.io.File;  // Import the File class
+import java.io.FileOutputStream;
 import java.io.IOException;  // Import the IOException class to handle errors
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.FileWriter;   // Import the FileWriter class
 
 import org.w3c.dom.Element;
@@ -116,31 +120,32 @@ public class SimuladorIoT extends Atomic {
     @Override
     public void deltint() {
     	List<Input> outliers = new ArrayList<Input>();
-    	if(contadorArray >= 300) {
+    	File file = new File("output.txt");
+	    
+    	if(contadorArray >= 1000) {
         	//listaInputs.add(new Input("example",1000.0,"dh5"));
         	//listaInputs.add(new Input("example",500.0,"dh5"));
         	//listaInputs.add(new Input("example",300.0,"dh5"));
 
     		try {
-    			//System.out.println(listaInputs.get(0).toString());
             	outliers = getOutliers(listaInputs);
-            	try {
-            	      FileWriter myWriter = new FileWriter("output.txt");
-            	      myWriter.write(outliers.toString());
-            	      myWriter.close();
-            	      //System.out.println("Successfully wrote to the file.");
-            	    } catch (IOException e) {
-            	      System.out.println("An error occurred.");
-            	      e.printStackTrace();
-            	    }
+            	
+        		FileWriter fr = new FileWriter(file, true);
+        		BufferedWriter br = new BufferedWriter(fr);
+        		PrintWriter pr = new PrintWriter(br);
+            	for (int i = 0; i < outliers.size(); i++) {           		
+            		pr.println(outliers.get(i).toString());
+            	}
+            	pr.println("Sep");
+            	pr.close();
+            	br.close();
+            	fr.close();
+            	listaInputs.clear();
+            	outliers.clear();
     		}
     		catch(Exception e) {
     			e.printStackTrace();
     		}
-
-            //System.out.println("Lista outliers: " + outliers);
-
-
             contadorArray=0;
             contadorPrint++;
         }
@@ -150,16 +155,9 @@ public class SimuladorIoT extends Atomic {
     @Override
     public void deltext(double e) {
         if (super.phaseIs("passive")) {
-            currentInput = iInAp1.getSingleValue();
+        	
+        	currentInput = iInAp1.getSingleValue();
             processInput(currentInput);
-
-            /*
-            if(currentInput != null) {
-	            System.out.println("Input recibido" + currentInput.toString());
-	            listaInputs.add(contadorArray,currentInput);
-	            contadorArray++;
-            }
-            */
             currentInput = iInAp5.getSingleValue();
             processInput(currentInput);
             currentInput = iInAp6.getSingleValue();
@@ -184,6 +182,7 @@ public class SimuladorIoT extends Atomic {
             processInput(currentInput);
             currentInput = iInDh9.getSingleValue();
             processInput(currentInput);
+          
             currentInput = iInDh10.getSingleValue();
             processInput(currentInput);
             super.holdIn("active", processingTime);

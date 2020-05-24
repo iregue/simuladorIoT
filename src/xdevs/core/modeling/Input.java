@@ -16,6 +16,7 @@ public class Input {
         return radiacion;
     }
 
+    
     public void setRadiacion(double radiacion) {
         this.radiacion = radiacion;
     }
