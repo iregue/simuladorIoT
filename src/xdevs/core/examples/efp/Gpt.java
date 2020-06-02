@@ -67,10 +67,10 @@ public class Gpt extends Coupled {
         super.addComponent(dh8);
         Generator dh9 = new Generator("dh9", period, userDirectory + "/data/dh9/");
         super.addComponent(dh9);
-        Generator dh10 = new Generator("dh10", period, userDirectory + "/data/dh10/");
+        Generator dh10 = new Generator("dh10", period, userDirectory + "/data/pruebas/");
         super.addComponent(dh10);
         
-    	SimuladorIoT simulator = new SimuladorIoT("simulador1", 3*period);
+    	SimuladorIoT simulator = new SimuladorIoT("simulador1", period);
         super.addComponent(simulator);
 
         

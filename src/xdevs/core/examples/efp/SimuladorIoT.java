@@ -122,14 +122,16 @@ public class SimuladorIoT extends Atomic {
     	List<Input> outliers = new ArrayList<Input>();
     	File file = new File("output.txt");
 	    
-    	if(contadorArray >= 1000) {
+    	if(contadorArray >= 100) {
         	//listaInputs.add(new Input("example",1000.0,"dh5"));
         	//listaInputs.add(new Input("example",500.0,"dh5"));
         	//listaInputs.add(new Input("example",300.0,"dh5"));
 
     		try {
+    			//System.out.println("ListaInputs" + listaInputs.toString());
             	outliers = getOutliers(listaInputs);
-            	
+    			//System.out.println("outliers" + outliers.toString());
+
         		FileWriter fr = new FileWriter(file, true);
         		BufferedWriter br = new BufferedWriter(fr);
         		PrintWriter pr = new PrintWriter(br);
@@ -157,34 +159,34 @@ public class SimuladorIoT extends Atomic {
         if (super.phaseIs("passive")) {
         	
         	currentInput = iInAp1.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInAp5.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInAp6.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInAp7.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh1.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh2.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh3.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh4.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh5.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh6.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh7.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh8.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             currentInput = iInDh9.getSingleValue();
             processInput(currentInput);
           
             currentInput = iInDh10.getSingleValue();
-            processInput(currentInput);
+            //processInput(currentInput);
             super.holdIn("active", processingTime);
         }
     }
@@ -210,21 +212,39 @@ public class SimuladorIoT extends Atomic {
         List<Input> data2 = new ArrayList<Input>();
         if (input.size() % 2 == 0) {
             data1 = input.subList(0, input.size() / 2);
+            //System.out.println("data1: " + data1.toString());
             data2 = input.subList(input.size() / 2, input.size());
+            //System.out.println("data2: " + data2.toString());
+
         }
         else {
             data1 = input.subList(0, input.size() / 2);
             data2 = input.subList(input.size() / 2 + 1, input.size());
         }
         double q1 = getMedian(data1);
+        System.out.println("q1: " + q1);
         double q3 = getMedian(data2);
-        double iqr = q3 - q1;
+        System.out.println("q3: " + q3);
+
+        double iqr = q3 - q1;       
+        if(iqr < 0) {
+        	iqr = -iqr;
+        }
+        System.out.println("iqr: " + iqr);
+
         double lowerFence = q1 - 1.5 * iqr;
+        System.out.println("lowerFence: " + lowerFence);
+
         double upperFence = q3 + 1.5 * iqr;
+        System.out.println("upperFence: " + upperFence);
+
         for (int i = 0; i < input.size(); i++) {
         	//System.out.println(input.get(i).toString());
-            if (input.get(i).getRadiacion() < lowerFence || input.get(i).getRadiacion() > upperFence)
-                output.add(input.get(i));
+            if (input.get(i).getRadiacion() < lowerFence || input.get(i).getRadiacion() > upperFence) {
+            	output.add(input.get(i));
+                System.out.println("Oulier: " + input.get(i).toString());
+            }
+                
         }
         return output;
     }
