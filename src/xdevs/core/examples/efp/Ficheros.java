@@ -41,7 +41,7 @@ import java.io.IOException;
  * @author José Luis Risco Martín TODO: I must also modify this class, according
  * to the source code implemented by Saurabh, a iStart input port must be added.
  */
-public class Generator extends Atomic {
+public class Ficheros extends Atomic {
     protected Port<Input> iStart = new Port<>("iStart");
     protected Port<Input> iStop = new Port<>("iStop");
     protected Port<Input> oOut = new Port<>("oOut");
@@ -51,7 +51,7 @@ public class Generator extends Atomic {
     protected ArrayList<Input> listaEntrada = new ArrayList<Input>();
     int contador = 0;
 
-    public Generator(String name, double period, String path) {
+    public Ficheros(String name, double period, String path) {
         super(name);
         super.addInPort(iStop);
         super.addInPort(iStart);
@@ -76,39 +76,35 @@ public class Generator extends Atomic {
 			System.out.println("Sorted: " + files.toString());
 			//for (final File fileEntry : folder.listFiles()) {
 			for (int k = 0; k < files.size(); k++) {
-
-		        if (/*fileEntry.isDirectory() && */false) {
-		            continue;
-		        }
-		        else {
-		        	System.out.println(files.get(k));
-		            //reader = new BufferedReader(new FileReader(fileEntry.getPath()));
-		            reader = new BufferedReader(new FileReader(files.get(k)));
-					String line = reader.readLine();
-					if(line != null) {
-						line = reader.readLine(); //Salta la primera linea
-					}
-					while (line != null) {
-						//System.out.println(line);
-						String[] arrOfStr = line.split(",");
-						try {
-							Input datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
-							listaEntrada.add(datosEntrada);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-						// read next line
-						line = reader.readLine();
-					}
-					reader.close();
-		        }
+		        
+		        System.out.println(files.get(k));
+		        //reader = new BufferedReader(new FileReader(fileEntry.getPath()));
+		        reader = new BufferedReader(new FileReader(files.get(k)));
+				String line = reader.readLine();
+				if(line != null) {
+					line = reader.readLine(); //Salta la primera linea
+				}
+				while (line != null) {
+					//System.out.println(line);
+					String[] arrOfStr = line.split(",");
+					try {
+						Input datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
+						listaEntrada.add(datosEntrada);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+					// read next line
+					line = reader.readLine();
+				}
+				reader.close();
+		        
 		    }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
     }
     
-    public Generator(Element xmlAtomic) {
+    public Ficheros(Element xmlAtomic) {
         super(xmlAtomic);
         iStart = (Port<Input>) super.getInPort(iStart.getName());
         iStop = (Port<Input>) super.getInPort(iStop.getName());
