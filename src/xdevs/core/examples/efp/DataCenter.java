@@ -21,8 +21,7 @@ public class DataCenter extends Atomic{
 
 	@Override
 	public void deltint() {
-		// TODO Auto-generated method stub
-		
+        super.passivate();		
 	}
 
 	@Override
@@ -30,7 +29,9 @@ public class DataCenter extends Atomic{
 		if (super.phaseIs("passive")) {
         	
         	currentInput = iInDataCenter.getSingleValue();
-        	System.out.println("DataCenter: " + currentInput.toString());
+        	if(currentInput != null) {
+            	System.out.println("DataCenter: " + currentInput.toString());
+        	}
             super.holdIn("active", processingTime);
         }
 		
@@ -44,7 +45,9 @@ public class DataCenter extends Atomic{
 
 	@Override
 	public void initialize() {
-        super.holdIn("active", processingTime);		
+        //super.holdIn("active", processingTime);
+        super.passivate();
+
 	}
 
 	@Override

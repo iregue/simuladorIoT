@@ -102,8 +102,9 @@ public class Gpt extends Coupled {
         super.addComponent(nodoVirtual15);
         FogServer fogserver1 = new FogServer("fogserver1", period);
         super.addComponent(fogserver1);
-        DataCenter dataCenter = new DataCenter("dataCenter", observationTime);
-        
+        DataCenter dataCenter = new DataCenter("dataCenter", period);
+        super.addComponent(dataCenter);
+
         super.addCoupling(ap1.oOut, nodoVirtual1.iInFichero);
         super.addCoupling(ap5.oOut, nodoVirtual2.iInFichero);
         /*super.addCoupling(ap6.oOut, nodoVirtual3.iInFichero);
@@ -140,10 +141,10 @@ public class Gpt extends Coupled {
 
         super.addCoupling(fogserver1.oOut, dataCenter.iInDataCenter);
         
-
     }
 
     public static void main(String args[]) {
+    	
         DevsLogger.setup(Level.INFO);
         Gpt gpt = new Gpt("gpt", 1, 200);
         //CoordinatorParallel coordinator = new CoordinatorParallel(gpt);

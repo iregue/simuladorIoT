@@ -180,7 +180,8 @@ public class FogServer extends Atomic {
         	
         	processInput(currentInput);
 
-            super.holdIn("active", processingTime);
+            super.passivate();
+            super.holdIn("active", 0);
         }
     }
 

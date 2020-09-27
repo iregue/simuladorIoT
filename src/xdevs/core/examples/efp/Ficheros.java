@@ -45,7 +45,6 @@ public class Ficheros extends Atomic {
     protected Port<Input> iStart = new Port<>("iStart");
     protected Port<Input> iStop = new Port<>("iStop");
     protected Port<Input> oOut = new Port<>("oOut");
-    protected int jobCounter;
     protected double period;
     protected String path;
     protected ArrayList<Input> listaEntrada = new ArrayList<Input>();
@@ -116,7 +115,6 @@ public class Ficheros extends Atomic {
 
     @Override
     public void initialize() {
-        jobCounter = 1;
         this.holdIn("active", period);
     }
 
@@ -126,7 +124,6 @@ public class Ficheros extends Atomic {
 
     @Override
     public void deltint() {
-        jobCounter++;
         this.holdIn("active", period);
     }
 
@@ -151,7 +148,7 @@ public class Ficheros extends Atomic {
 
 	@Override
 	public String toString() {
-		return "Generator [iStart=" + iStart + ", iStop=" + iStop + ", oOut=" + oOut + ", jobCounter=" + jobCounter
+		return "Generator [iStart=" + iStart + ", iStop=" + iStop + ", oOut=" + oOut 
 				+ ", period=" + period + ", listaEntrada=" + listaEntrada + "]";
 	}
     
