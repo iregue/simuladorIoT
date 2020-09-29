@@ -44,7 +44,7 @@ public class Ef extends Coupled {
     FogServer transducer = new FogServer("transducer", observationTime);
     super.addComponent(transducer);
     
-    super.addCoupling(this.iIn, transducer.iInNodoVirtual1);
+    super.addCoupling(this.iIn, transducer.iInNodovirtual1);
     super.addCoupling(generator.oOut, this.oOut);
     super.addCoupling(generator.oOut, transducer.iArrived);
     super.addCoupling(transducer.oOut, generator.iStop);
