@@ -147,7 +147,8 @@ public class FogServer extends Atomic {
     public void deltext(double e) {
     	if (super.phaseIs("passive")) {
         	
-        	currentInput = iInNodoVirtual1.getSingleValue();
+// ANSIBLE DELTEXT
+        	
         	if(currentInput != null) {
             	System.out.println("FogServer: " + currentInput.toString());
 
