@@ -47,6 +47,8 @@ public class FogServer extends Atomic {
     private static final Logger LOGGER = Logger.getLogger(FogServer.class.getName());
 
     protected Port<Input> iArrived = new Port<>("iArrived");
+
+// ANSIBLE PORTINIT
     protected Port<Input> iInNodoVirtual1 = new Port<>("iInNodoVirtual1");
     protected Port<Input> iInNodoVirtual2 = new Port<>("iInNodoVirtual2");
     protected Port<Input> iInNodoVirtual3 = new Port<>("iInNodoVirtual3");
@@ -75,6 +77,7 @@ public class FogServer extends Atomic {
     public FogServer(String name, double processingTime) {
         super(name);
         super.addInPort(iArrived);
+// ANSIBLE CONSTRUCTOR
         super.addInPort(iInNodoVirtual1);
         super.addInPort(iInNodoVirtual2);
         super.addInPort(iInNodoVirtual3);
