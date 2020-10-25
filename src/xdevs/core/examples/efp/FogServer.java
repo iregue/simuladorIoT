@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -51,7 +52,6 @@ public class FogServer extends Atomic {
 // ANSIBLE PORTINIT
 
     protected Input currentInput = null;
-
     protected Port<Input> oOut = new Port<>("oOut");
 
     protected double processingTime;
@@ -59,6 +59,7 @@ public class FogServer extends Atomic {
     protected int contadorArray = 0;
     protected int contadorPrint = 0;
     protected File outputFile;
+    protected Collection<Input> collection = null;
 
     public FogServer(String name, double processingTime) {
         super(name);
@@ -163,7 +164,8 @@ public class FogServer extends Atomic {
 
     @Override
     public void lambda() {
-        oOut.addValue(currentInput);
+    	oOut.addValues(listaInputs);
+        //oOut.addValue(currentInput);
     }
     
     
