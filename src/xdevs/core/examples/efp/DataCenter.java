@@ -1,5 +1,7 @@
 package xdevs.core.examples.efp;
 
+import java.util.Collection;
+
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
@@ -28,7 +30,10 @@ public class DataCenter extends Atomic{
 	public void deltext(double e) {
 		if (super.phaseIs("passive")) {
         	
-        	currentInput = iInDataCenter.getSingleValue();
+			Collection<Input> collection = iInDataCenter.getValues();
+		    System.out.println("DATACENTER COLLECTION: " + collection);
+
+        	//currentInput = iInDataCenter.getSingleValue();
         	if(currentInput != null) {
             	System.out.println("DataCenter: " + currentInput.toString());
         	}
