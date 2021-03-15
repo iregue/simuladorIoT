@@ -2,7 +2,7 @@ package xdevs.core.examples.efp;
 
 import java.util.ArrayList; // import the ArrayList class
 import java.util.Collections;
-import org.nd4j.linalg.api.ops.random.impl.Linspace;
+import Jama.Matrix;
 
 public class Kriging {
 	
@@ -12,7 +12,11 @@ public class Kriging {
 	
 	static ArrayList<Double> hh = new ArrayList<Double>(); // Create an ArrayList object
 	static ArrayList<Double> vv = new ArrayList<Double>(); // Create an ArrayList object
-
+	static double x0= 5.0;
+	static double y0= 5.0;
+	static double f0;
+	
+	
 	public static void distancia(ArrayList<Double> x, ArrayList<Double> y, ArrayList<Double> valores) {
 		
 		for (int i=0; i < x.size();i++) {
@@ -44,19 +48,14 @@ public class Kriging {
 		double c = cmax - c0;
 		int a = h.size() - N;
 		
-		/*
-		Linspace haux = new Linspace(0, h.size()-1,100);
-		System.out.println(haux.z().data().getNumber(2));
 		
-		ArrayList<Double> vaux = new ArrayList<Double>();
-		for(int i = 0; i < haux.z().length(); i++) {
-			Double variogram = variograma(c0, c, a, (float)haux.z().data().getNumber(i));
-			vaux.add(variogram);
-		}
-		System.out.println(vaux);
-		*/
 		System.out.println(x_list.size());
 		double [][] A = new double[x_list.size()+1][x_list.size()+1];
+		for(int i=0; i<x_list.size()+1; i++) {
+			for(int j=0; j<x_list.size()+1; j++) {
+				A[i][j] = 1.0;
+			}	
+		}
 		for(int i=0; i<x_list.size(); i++) {
 			for(int j=0; j<x_list.size(); j++) {
 				if(i==j) {
@@ -68,13 +67,31 @@ public class Kriging {
 			}
 		}
 		A[x_list.size()][x_list.size()] = 0;
-		System.out.println("valores introducidos:");
+		//Print matriz A
+		System.out.println("valores introducidos A:");
         for (int i = 0; i < A.length; i++) { 
             for (int j = 0; j < A[i].length; j++) {
                 System.out.print(A[i][j] + " ");
             }
             System.out.println();
         }
+        double [][] B = new double[x_list.size()+1][1];
+        for(int i=0; i <x_list.size(); i++) {
+        	B[i][0] = variograma(c0, c, a, Math.sqrt(Math.pow(x_list.get(i) - x0, 2)+ Math.pow(y_list.get(i) - y0, 2)));
+        }
+        
+        Matrix A_matrix = new Matrix(A);
+        Matrix B_matrix = new Matrix(B);
+        A_matrix.print(5, 2);
+        B_matrix.print(5, 2);
+        
+        Matrix w = A_matrix.inverse().times(B_matrix);
+        w.print(5, 2);
+        
+        for(int i=0; i<valores.size(); i++) {
+        	f0 += w.get(i, 0)*valores.get(i);
+        }
+        System.out.println("f0= " + f0);
 	}
 	
 	public static void main(String[] args) {
@@ -102,16 +119,16 @@ public class Kriging {
 		y_list.add(1.80);
 		y_list.add(-2.33);
 		
-		valores.add(30.1);
-		valores.add(13.7);
+		valores.add(130.1);
+		valores.add(113.7);
 		valores.add(28.6);
-		valores.add(19.3);
+		valores.add(119.3);
 		valores.add(54.2);
 		valores.add(37.8);
 		valores.add(61.1);
-		valores.add(39.8);
+		valores.add(19.8);
 		valores.add(62.9);
-		valores.add(16.0);
+		valores.add(116.0);
 
 		distancia(x_list, y_list, valores);
 	}
