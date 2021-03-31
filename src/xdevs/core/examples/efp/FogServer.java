@@ -298,7 +298,9 @@ public class FogServer extends Atomic {
         	//########################################
         	contadorKriging++;
         	if(contadorKriging == 100) {
+        		Input krigingInput;
         		double valor = 0.0;
+        		double valorMedio = 0.0;
         		valores.add(krigingiInNodoVirtual1/100);
         		valores.add(krigingiInNodoVirtual2/100);
         		valores.add(77.0);
@@ -310,8 +312,31 @@ public class FogServer extends Atomic {
         		}
         		catch(Exception e1) {
         			System.out.println(e1);
+        			
         		}
-        		Input krigingInput = new Input(currentInputNodovirtual1.getDate(), valor, "kriging");
+        		double max = valores.get(0);
+        		double min = valores.get(0);
+        		for (int i= 0; i< valores.size(); i++) {
+        			if(valores.get(i) < min) {
+        				min = valores.get(i);
+        			}
+        			
+        			if(valores.get(i) > max) {
+        				max = valores.get(i);
+        			}
+        			
+        		}
+        		if(valor < max && valor > min) {
+            		krigingInput = new Input(currentInputNodovirtual1.getDate(), valor, "kriging");
+        		}
+        		else {
+        			//Si el valor no es acorde a lo esperado, reemplazarlo por la media del resto
+        			for(int i=0; i < valores.size(); i++) {
+        				valorMedio += valores.get(i);
+        			}
+        			valorMedio = valorMedio / (valores.size()-1); 
+            		krigingInput = new Input(currentInputNodovirtual1.getDate(), valorMedio, "krigingCorregido");
+        		}
         		processInput(krigingInput);
         		contadorKriging=0;
         	}
