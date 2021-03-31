@@ -72,16 +72,21 @@ public class FogServer extends Atomic {
     public static ArrayList<Double> x_list = new ArrayList<Double>(); // Create an ArrayList object
 	public static ArrayList<Double> y_list = new ArrayList<Double>(); // Create an ArrayList object
 	public static ArrayList<Double> valores = new ArrayList<Double>(); // Create an ArrayList object
-	double x0 = 13.0;
-	double y0 = 80.0;
+	double x0 = 0.0;
+	double y0 = 0.0;
+	String krigingDate;
 	protected int contadorKriging = 0;
+// ANSIBLE KRIGINGINIT
+
 	//########################################
-	double krigingiInNodoVirtual1 = 0.0;
-	double krigingiInNodoVirtual2 = 0.0;
+	//double krigingiInNodoVirtual1 = 0.0;
+	//double krigingiInNodoVirtual2 = 0.0;
 	//########################################
-    public FogServer(String name, double processingTime) {
+    public FogServer(String name, double processingTime, double krigingX, double krigingY) {
         super(name);
         super.addInPort(iArrived);
+		x0 = krigingX;
+		y0 = krigingY;
 // ANSIBLE CONSTRUCTOR
 
         this.processingTime = processingTime;
@@ -252,35 +257,48 @@ public class FogServer extends Atomic {
     @Override
     public void deltext(double e) {
     	if (super.phaseIs("passive")) {
+// ANSIBLE DELTEXT
+
         	//########################################
-    		currentInputNodovirtual1 = iInNodoVirtual1.getSingleValue();
+    		/*
+			currentInputNodovirtual1 = iInNodoVirtual1.getSingleValue();
     		processInput(currentInputNodovirtual1);
+
+			if(currentInputNodovirtual1 != null) {
+            	System.out.println("FogServer: " + currentInputNodovirtual1.toString());
+            	processInput(currentInputNodovirtual1);
+            	krigingiInNodoVirtual1 += currentInputNodovirtual1.getRadiacion();
+				krigingDate = currentInputNodovirtual1.getDate();
+        	}
 
     		currentInputNodovirtual2 = iInNodoVirtual2.getSingleValue();
     		processInput(currentInputNodovirtual2);
     		
-        	if(currentInputNodovirtual1 != null) {
-            	System.out.println("FogServer: " + currentInputNodovirtual1.toString());
-            	processInput(currentInputNodovirtual1);
-            	krigingiInNodoVirtual1 += currentInputNodovirtual1.getRadiacion();
-        	}
+        	
         	
         	if(currentInputNodovirtual2 != null) {
             	System.out.println("FogServer: " + currentInputNodovirtual2.toString());
             	processInput(currentInputNodovirtual2);
             	krigingiInNodoVirtual2 += currentInputNodovirtual2.getRadiacion();
         	}
+			*/
         	//########################################
         	contadorKriging++;
         	if(contadorKriging == 100) {
         		Input krigingInput;
         		double valor = 0.0;
         		double valorMedio = 0.0;
-        		valores.add(krigingiInNodoVirtual1/100);
+// ANSIBLE KRIGING_ADD_VALUES
+
+				/*
+				if(krigingiInNodoVirtual1 != 0.0){
+					valores.add(krigingiInNodoVirtual1/100);
+				}
         		valores.add(krigingiInNodoVirtual2/100);
         		valores.add(77.0);
         		valores.add(85.0);
         		valores.add(70.0);
+				*/
         		try {
         			valor = calculateKriging(x_list, y_list, valores, x0, y0);
             		//System.out.println("VALOR KRINGIN:" + valor );
@@ -302,7 +320,7 @@ public class FogServer extends Atomic {
         			
         		}
         		if(valor < max && valor > min) {
-            		krigingInput = new Input(currentInputNodovirtual1.getDate(), valor, "kriging");
+            		krigingInput = new Input(krigingDate, valor, "kriging");
         		}
         		else {
         			//Si el valor no es acorde a lo esperado, reemplazarlo por la media del resto
@@ -310,7 +328,7 @@ public class FogServer extends Atomic {
         				valorMedio += valores.get(i);
         			}
         			valorMedio = valorMedio / (valores.size()-1); 
-            		krigingInput = new Input(currentInputNodovirtual1.getDate(), valorMedio, "krigingCorregido");
+            		krigingInput = new Input(krigingDate, valorMedio, "krigingCorregido");
         		}
         		processInput(krigingInput);
         		contadorKriging=0;
