@@ -1,7 +1,6 @@
 target
 *.swp
 *.log
-data/
 output.txt
 # IntelliJ stuff
 .idea/
