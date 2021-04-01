@@ -82,7 +82,7 @@ public class FogServer extends Atomic {
 	//double krigingiInNodoVirtual1 = 0.0;
 	//double krigingiInNodoVirtual2 = 0.0;
 	//########################################
-    public FogServer(String name, double processingTime, double krigingX, double krigingY) {
+    public FogServer(String name, double processingTime, double krigingX, double krigingY, List<Double> coordenadasX, List<Double> coordenadasY) {
         super(name);
         super.addInPort(iArrived);
 		x0 = krigingX;
@@ -104,13 +104,18 @@ public class FogServer extends Atomic {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+        for(int i =0; i < coordenadasX.size(); i++) {
+        	x_list.add(coordenadasX.get(i));
+        	y_list.add(coordenadasY.get(i));
+        }
       //########################################
+        /*
         x_list.add(12.771);
         x_list.add(9.692);
         x_list.add(8.165);
         x_list.add(14.779);
         x_list.add(15.409);
-        /*
+        
         x_list.add(14.244);
         x_list.add(12.264);
         x_list.add(12.957);
@@ -120,13 +125,13 @@ public class FogServer extends Atomic {
         x_list.add(10.304);
         x_list.add(12.744);
         x_list.add(11.875);
-		*/
+		
         y_list.add(83.829);
         y_list.add(82.415);
         y_list.add(79.381);
         y_list.add(77.897);
         y_list.add(86.845);
-        /*
+        
         y_list.add(84.642);
         y_list.add(84.802);
         y_list.add(85.018);
