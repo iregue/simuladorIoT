@@ -57,9 +57,9 @@ public class FogServer extends Atomic {
 
 // ANSIBLE PORTINIT
 
-    protected Input currentInput = null;
-    protected Input currentInputNodovirtual1 = null;
-    protected Input currentInputNodovirtual2 = null;
+    //protected Input currentInput = null;
+    //protected Input currentInputNodovirtual1 = null;
+    //protected Input currentInputNodovirtual2 = null;
 
     protected Port<Input> oOut = new Port<>("oOut");
 
