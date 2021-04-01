@@ -41,10 +41,10 @@ public class Ef extends Coupled {
     super.addOutPort(oOut);
     Ficheros generator = new Ficheros("generator", period, "/home/iregueiro/Documentos/universidad/xdevs/data/dh5/");
     super.addComponent(generator);
-    FogServer transducer = new FogServer("transducer", observationTime);
+    FogServer transducer = new FogServer("transducer", observationTime, 70.0, 75.0);
     super.addComponent(transducer);
     
-    super.addCoupling(this.iIn, transducer.iInNodovirtual1);
+    //super.addCoupling(this.iIn, transducer.iInNodovirtual1);
     super.addCoupling(generator.oOut, this.oOut);
     super.addCoupling(generator.oOut, transducer.iArrived);
     super.addCoupling(transducer.oOut, generator.iStop);
