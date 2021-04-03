@@ -21,6 +21,8 @@
  */
 package xdevs.core.examples.efp;
 
+import java.util.Arrays;
+
 import xdevs.core.modeling.Coupled;
 import xdevs.core.modeling.Port;
 
@@ -41,7 +43,7 @@ public class Ef extends Coupled {
     super.addOutPort(oOut);
     Ficheros generator = new Ficheros("generator", period, "/home/iregueiro/Documentos/universidad/xdevs/data/dh5/");
     super.addComponent(generator);
-    FogServer transducer = new FogServer("transducer", observationTime, 70.0, 75.0);
+    FogServer transducer = new FogServer("transducer", observationTime, 70.0, 75.0, Arrays.asList(1.0, 2.0, 3.0), Arrays.asList(4.0, 3.0, 5.0));
     super.addComponent(transducer);
     
     //super.addCoupling(this.iIn, transducer.iInNodovirtual1);

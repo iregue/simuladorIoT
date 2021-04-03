@@ -8,14 +8,18 @@ import xdevs.core.modeling.Port;
 
 public class DataCenter extends Atomic{
 
-    protected Port<Input> iInDataCenter = new Port<>("iInDataCenter");
+    //protected Port<Input> iInDataCenter = new Port<>("iInDataCenter");
+ // ANSIBLE PORTINIT
+
     protected Port<Input> oOutDataCenter = new Port<>("oOutDataCenter");
     protected double processingTime;
     protected Input currentInput = null;
 
     public DataCenter(String name, double processingTime) {
         super(name);
-        super.addInPort(iInDataCenter);
+// ANSIBLE CONSTRUCTOR
+
+        //super.addInPort(iInDataCenter);
         super.addOutPort(oOutDataCenter);
         this.processingTime = processingTime;
         
@@ -30,9 +34,10 @@ public class DataCenter extends Atomic{
 	public void deltext(double e) {
 		if (super.phaseIs("passive")) {
         	
-			Collection<Input> collection = iInDataCenter.getValues();
-		    System.out.println("DATACENTER COLLECTION: " + collection);
-
+			//Collection<Input> collection = iInDataCenter.getValues();
+		    //System.out.println("DATACENTER COLLECTION: " + collection);
+// ANSIBLE DELTEXT
+		    
         	//currentInput = iInDataCenter.getSingleValue();
         	if(currentInput != null) {
             	System.out.println("DataCenter: " + currentInput.toString());
