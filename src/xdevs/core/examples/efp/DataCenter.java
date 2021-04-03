@@ -1,5 +1,8 @@
 package xdevs.core.examples.efp;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 
 import xdevs.core.modeling.Atomic;
@@ -64,4 +67,12 @@ public class DataCenter extends Atomic{
 	public void exit() {		
 	}
     
+	public void storeCollection(Collection<Input> collection) throws IOException{
+	    BufferedWriter writer = new BufferedWriter(new FileWriter("collections_output.txt", true));
+	    writer.newLine();
+	    writer.append(collection.toString());
+	    writer.close();
+		
+	}
+	
 }
