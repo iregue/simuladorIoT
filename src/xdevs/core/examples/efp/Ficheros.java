@@ -21,13 +21,13 @@
  */
 package xdevs.core.examples.efp;
 
-import java.nio.file.Paths;
+//import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.text.SimpleDateFormat;  
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
@@ -49,37 +49,52 @@ public class Ficheros extends Atomic {
     protected String path;
     protected ArrayList<Input> listaEntrada = new ArrayList<Input>();
     int contador = 0;
-
-    public Ficheros(String name, double period, String path) {
+    private String line;
+    private BufferedReader reader;
+    ArrayList<String> files = new ArrayList<String>();
+    private int contadorFicheros = 0;
+    long initialDate = 0;
+    long startDate = 0;
+    long endDate = 0;
+    long actualDate = 0;
+    Input inputToSend = null;
+    
+    public Ficheros(String name, double period, String path, String startDate, String endDate) {
         super(name);
         super.addInPort(iStop);
         super.addInPort(iStart);
         super.addOutPort(oOut);
         this.period = period;
         this.path = path;
+        if(startDate != null && endDate != null) {
+	        try {
+				this.startDate = parseDate(startDate).getTime();
+				this.endDate = parseDate(endDate).getTime();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+        }
         
-        BufferedReader reader;
 		try {
-			//TODO: Recorrer ficheros de un directorio
+			//Recorrer ficheros de un directorio
+			/*
 			String userDirectory = Paths.get("")
 			        .toAbsolutePath()
 			        .toString();
-			
+			*/
 			final File folder = new File(path);
-			ArrayList<String> files = new ArrayList<String>();
-			int i = 0;
+			//ArrayList<String> files = new ArrayList<String>();
 			for (final File fileEntry : folder.listFiles()) {
 				files.add(fileEntry.getPath());
 			}
 			Collections.sort(files);
 			System.out.println("Sorted: " + files.toString());
-			//for (final File fileEntry : folder.listFiles()) {
+			/*
 			for (int k = 0; k < files.size(); k++) {
 		        
 		        System.out.println(files.get(k));
-		        //reader = new BufferedReader(new FileReader(fileEntry.getPath()));
 		        reader = new BufferedReader(new FileReader(files.get(k)));
-				String line = reader.readLine();
+				line = reader.readLine();
 				if(line != null) {
 					line = reader.readLine(); //Salta la primera linea
 				}
@@ -98,33 +113,112 @@ public class Ficheros extends Atomic {
 				reader.close();
 		        
 		    }
-		} catch (IOException e) {
+			*/
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
     }
-    
-    public Ficheros(Element xmlAtomic) {
-        super(xmlAtomic);
-        iStart = (Port<Input>) super.getInPort(iStart.getName());
-        iStop = (Port<Input>) super.getInPort(iStop.getName());
-        oOut = (Port<Input>) super.getOutPort(oOut.getName());  
-        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
-        Element xmlParameter = (Element)xmlParameters.item(0);
-        period = Double.valueOf(xmlParameter.getAttribute("value"));
-    }
 
     @Override
-    public void initialize() {
-        this.holdIn("active", period);
+    public void initialize(){
+    	Input datosEntrada = null;
+    	try {
+		    reader = new BufferedReader(new FileReader(files.get(contadorFicheros)));
+		    line = reader.readLine(); //Se salta la primera linea
+		    line = reader.readLine();
+		    if(line != null) {
+		    	String[] arrOfStr = line.split(",");
+				try {
+					datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
+				} 
+				catch (Exception e) {
+						e.printStackTrace();
+				}
+		    }
+    	}
+    	catch (IOException e) {
+			e.printStackTrace();
+		}
+    	if(datosEntrada.getDate() !=null) {
+	    	try {
+				initialDate = parseDate(datosEntrada.getDate()).getTime();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    	if((startDate <= initialDate && initialDate <= endDate) || startDate == 0) {
+	    		inputToSend = datosEntrada;
+	    	}
+    	}
+    	
+    	//Leer primer linea con datos del fichero
+        //Fecha=2010-03-20 17:27:07 
+    	//radiacion=258.692
+    	this.holdIn("active", 0);
+        
     }
 
     @Override
     public void exit() {
+    	try {
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     @Override
     public void deltint() {
-        this.holdIn("active", period);
+    	boolean existOtherFile = true;
+    	Input datosEntrada = null;
+    	try {
+    		//if(contadorFicheros < files.size()) {
+		    	//reader = new BufferedReader(new FileReader(files.get(contadorFicheros)));
+		    	line = reader.readLine();
+		    	if(line == null) {
+		    		existOtherFile = nextFile();
+		    	}
+		    	if(!existOtherFile) {
+		    		this.passivate();
+		    	}
+		    	if(line != null && existOtherFile) {
+			    	String[] arrOfStr = line.split(",");
+					try {
+						datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
+						
+						if(datosEntrada.getDate() !=null) {
+					    	try {
+								actualDate = parseDate(datosEntrada.getDate()).getTime();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+					    	if((startDate <= initialDate && initialDate <= endDate) || startDate == 0) {
+					    		inputToSend = datosEntrada;
+					    	}
+				    	}
+				    	double period = (actualDate - initialDate)/1000;
+				        this.holdIn("active", period);
+				        initialDate = actualDate;
+					}
+					catch (Exception e) {
+							e.printStackTrace();
+					}
+		    	}
+    		//}
+    		
+    	}
+    	catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    	//Leer siguiente linea del fichero
+    	//Nueva fecha=Fecha=2010-03-20 17:27:08
+    	//Diferencia = fecha nueva - fecha = 1
+    	//radiación=259.692
+    	//this.holdIn("active", Diferencia);
+    	//Si termina el fichero this.passivate();
+    	
+    	
     }
 
     @Override
@@ -134,6 +228,7 @@ public class Ficheros extends Atomic {
 
     @Override
     public void lambda() {
+    	/*
     	Input input = null;
     	if(contador < listaEntrada.size()) {
     		input = (Input) listaEntrada.get(contador);
@@ -143,14 +238,40 @@ public class Ficheros extends Atomic {
     	else {
     		input = null;
     	}
-        oOut.addValue(input);
+    	*/
+        oOut.addValue(inputToSend);
     }
 
 	@Override
 	public String toString() {
 		return "Generator [iStart=" + iStart + ", iStop=" + iStop + ", oOut=" + oOut 
-				+ ", period=" + period + ", listaEntrada=" + listaEntrada + "]";
+				+ ", period=" + period;
 	}
     
+    public Date parseDate(String sDate) throws Exception{
+    	String[] splitDate = line.split("-");
+    	//2010-03-20 17:29:59-10:00
+    	String stringDate= splitDate[0] + "-" + splitDate[1] + "-" + splitDate[2];
+        SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+        Date date=formatter.parse(stringDate);
+        return date;
+    }
     
+    public boolean nextFile() {
+    	contadorFicheros++;
+    	if(contadorFicheros < files.size()) {
+    		try {
+				reader = new BufferedReader(new FileReader(files.get(contadorFicheros)));
+				line = reader.readLine(); //Se salta la primera linea del fichero
+	    		line = reader.readLine();
+			} 
+    		catch (Exception e) {
+				e.printStackTrace();
+			}
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
+    }
 }

@@ -41,7 +41,7 @@ public class Ef extends Coupled {
     super.addInPort(iIn);
     super.addInPort(iStart);
     super.addOutPort(oOut);
-    Ficheros generator = new Ficheros("generator", period, "/home/iregueiro/Documentos/universidad/xdevs/data/dh5/");
+    Ficheros generator = new Ficheros("generator", period, "/home/iregueiro/Documentos/universidad/xdevs/data/dh5/", null, null);
     super.addComponent(generator);
     FogServer transducer = new FogServer("transducer", observationTime, 70.0, 75.0, Arrays.asList(1.0, 2.0, 3.0), Arrays.asList(4.0, 3.0, 5.0));
     super.addComponent(transducer);
