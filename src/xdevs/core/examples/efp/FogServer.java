@@ -345,8 +345,10 @@ public class FogServer extends Atomic {
 
     @Override
     public void lambda() {
-    	oOut.addValues(listaInputs);
-        //oOut.addValue(currentInput);
+    	if(contadorArray >=100) {
+    		oOut.addValues(listaInputs);
+    		contadorArray=0;
+    	}
     }
     
     
