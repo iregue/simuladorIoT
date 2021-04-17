@@ -46,4 +46,7 @@ public class Input {
 		return "Input [radiacion=" + radiacion + ", Generador=" + nodoVirtual +", Date=" + date + "]";
 	}
 
+	public String toCSV() {
+		return radiacion + ";" + nodoVirtual +";" + date ;
+	}
 }

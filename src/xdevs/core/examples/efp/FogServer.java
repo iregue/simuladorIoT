@@ -251,7 +251,6 @@ public class FogServer extends Atomic {
     		catch(Exception e) {
     			e.printStackTrace();
     		}
-            contadorArray=0;
             contadorPrint++;
         }
         

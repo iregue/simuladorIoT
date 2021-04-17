@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
@@ -70,9 +71,12 @@ public class DataCenter extends Atomic{
 	public void storeCollection(Collection<Input> collection) throws IOException{
 	    BufferedWriter writer = new BufferedWriter(new FileWriter("collections_output.txt", true));
 	    writer.newLine();
-	    writer.append(collection.toString());
+	    Iterator<Input> it = collection.iterator();
+	    while(it.hasNext()) {
+		    writer.append(it.next().toCSV());
+		    writer.newLine();
+	    }
 	    writer.close();
-		
 	}
 	
 }
