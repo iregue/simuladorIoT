@@ -26,6 +26,7 @@ package xdevs.core.examples.efp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.logging.Logger;
 import java.text.SimpleDateFormat;  
 
 import xdevs.core.modeling.Atomic;
@@ -42,6 +43,7 @@ import java.io.IOException;
  * to the source code implemented by Saurabh, a iStart input port must be added.
  */
 public class Ficheros extends Atomic {
+    private static final Logger LOGGER = Logger.getLogger(Ficheros.class.getName());
     protected Port<Input> iStart = new Port<>("iStart");
     protected Port<Input> iStop = new Port<>("iStop");
     protected Port<Input> oOut = new Port<>("oOut");
@@ -72,6 +74,7 @@ public class Ficheros extends Atomic {
 				this.endDate = parseDate(endDate).getTime();
 			} catch (Exception e1) {
 				e1.printStackTrace();
+				LOGGER.severe(this.name + "- Exception parsing endDate and/or startDate. Format have to be yyyy-MM-dd HH:mm:ss");
 			}
         }
         
@@ -116,11 +119,13 @@ public class Ficheros extends Atomic {
 			*/
 		} catch (Exception e) {
 			e.printStackTrace();
+			LOGGER.warning(this.name + "- Exception getting files list");
 		}
     }
 
     @Override
     public void initialize(){
+    	LOGGER.info(this.name + ": Ficheros Initialize");
     	Input datosEntrada = null;
     	try {
 		    reader = new BufferedReader(new FileReader(files.get(contadorFicheros)));
@@ -132,7 +137,8 @@ public class Ficheros extends Atomic {
 					datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
 				} 
 				catch (Exception e) {
-						e.printStackTrace();
+					e.printStackTrace();
+					LOGGER.warning(this.name + "- Exception parsing radiation value to double:" + arrOfStr[1]);
 				}
 		    }
     	}
@@ -144,6 +150,7 @@ public class Ficheros extends Atomic {
 				initialDate = parseDate(datosEntrada.getDate()).getTime();
 			} catch (Exception e) {
 				e.printStackTrace();
+				LOGGER.warning(this.name + "- Exception parsing date:" + datosEntrada.getDate());
 			}
 	    	if((startDate <= initialDate && initialDate <= endDate) || startDate == 0) {
 	    		inputToSend = datosEntrada;
@@ -171,40 +178,36 @@ public class Ficheros extends Atomic {
     	boolean existOtherFile = true;
     	Input datosEntrada = null;
     	try {
-    		//if(contadorFicheros < files.size()) {
-		    	//reader = new BufferedReader(new FileReader(files.get(contadorFicheros)));
-		    	line = reader.readLine();
-		    	if(line == null) {
-		    		existOtherFile = nextFile();
-		    	}
-		    	if(!existOtherFile) {
-		    		this.passivate();
-		    	}
-		    	if(line != null && existOtherFile) {
-			    	String[] arrOfStr = line.split(",");
-					try {
-						datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
-						
-						if(datosEntrada.getDate() !=null) {
-					    	try {
-								actualDate = parseDate(datosEntrada.getDate()).getTime();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-					    	if((startDate <= initialDate && initialDate <= endDate) || startDate == 0) {
-					    		inputToSend = datosEntrada;
-					    	}
-				    	}
-				    	double period = (actualDate - initialDate)/1000;
-				        this.holdIn("active", period);
-				        initialDate = actualDate;
-					}
-					catch (Exception e) {
+	    	line = reader.readLine();
+	    	if(line == null) {
+	    		existOtherFile = nextFile();
+	    	}
+	    	if(!existOtherFile) {
+	    		this.passivate();
+	    	}
+	    	if(line != null && existOtherFile) {
+		    	String[] arrOfStr = line.split(",");
+				try {
+					datosEntrada = new Input(arrOfStr[0],Double.parseDouble(arrOfStr[1]),name);
+					
+					if(datosEntrada.getDate() !=null) {
+				    	try {
+							actualDate = parseDate(datosEntrada.getDate()).getTime();
+						} catch (Exception e) {
 							e.printStackTrace();
-					}
-		    	}
-    		//}
-    		
+						}
+				    	if((startDate <= initialDate && initialDate <= endDate) || startDate == 0) {
+				    		inputToSend = datosEntrada;
+				    	}
+			    	}
+			    	double period = (actualDate - initialDate)/1000;
+			        this.holdIn("active", period);
+			        initialDate = actualDate;
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+	    	}    		
     	}
     	catch (IOException e) {
 			e.printStackTrace();
@@ -239,6 +242,7 @@ public class Ficheros extends Atomic {
     		input = null;
     	}
     	*/
+    	LOGGER.info(this.name + "- Send value to NodoVirtual" + inputToSend);
         oOut.addValue(inputToSend);
     }
 
@@ -261,6 +265,7 @@ public class Ficheros extends Atomic {
     	contadorFicheros++;
     	if(contadorFicheros < files.size()) {
     		try {
+    			LOGGER.info(this.name + ": Start reading new file");
 				reader = new BufferedReader(new FileReader(files.get(contadorFicheros)));
 				line = reader.readLine(); //Se salta la primera linea del fichero
 	    		line = reader.readLine();
@@ -271,6 +276,7 @@ public class Ficheros extends Atomic {
     		return true;
     	}
     	else {
+			LOGGER.info(this.name + ": Not more files to read");
     		return false;
     	}
     }

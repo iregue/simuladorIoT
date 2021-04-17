@@ -5,14 +5,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
 
 public class DataCenter extends Atomic{
+    private static final Logger LOGGER = Logger.getLogger(DataCenter.class.getName());
 
-    //protected Port<Input> iInDataCenter = new Port<>("iInDataCenter");
 // ANSIBLE PORTINIT
 
     protected Port<Input> oOutDataCenter = new Port<>("oOutDataCenter");
@@ -39,10 +40,8 @@ public class DataCenter extends Atomic{
 		if (super.phaseIs("passive")) {
         	
 			//Collection<Input> collection = iInDataCenter.getValues();
-		    //System.out.println("DATACENTER COLLECTION: " + collection);
 // ANSIBLE DELTEXT
 		    
-        	//currentInput = iInDataCenter.getSingleValue();
         	if(currentInput != null) {
             	System.out.println("DataCenter: " + currentInput.toString());
         	}
@@ -69,6 +68,7 @@ public class DataCenter extends Atomic{
 	}
     
 	public void storeCollection(Collection<Input> collection) throws IOException{
+		LOGGER.info(this.name + "- Storing data in file");
 	    BufferedWriter writer = new BufferedWriter(new FileWriter("collections_output.txt", true));
 	    writer.newLine();
 	    Iterator<Input> it = collection.iterator();

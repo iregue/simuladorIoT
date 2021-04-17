@@ -21,19 +21,7 @@
  */
 package xdevs.core.examples.efp;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.io.BufferedWriter;
-import java.io.File;  // Import the File class
-import java.io.FileOutputStream;
-import java.io.IOException;  // Import the IOException class to handle errors
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.FileWriter;   // Import the FileWriter class
-
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
+import java.util.logging.Logger;
 import xdevs.core.modeling.Atomic;
 import xdevs.core.modeling.Input;
 import xdevs.core.modeling.Port;
@@ -43,7 +31,7 @@ import xdevs.core.modeling.Port;
  * @author jlrisco
  */
 public class NodoVirtual extends Atomic {
-
+    private static final Logger LOGGER = Logger.getLogger(NodoVirtual.class.getName());
     protected Port<Input> iInFichero = new Port<>("iInFichero");
     protected Port<Input> iInFisico = new Port<>("iInFisico");
     protected Port<Input> iInDB = new Port<>("iInDB");
@@ -62,16 +50,7 @@ public class NodoVirtual extends Atomic {
         this.processingTime = processingTime;
         
     }
-/*
-    public SimuladorIoT(Element xmlAtomic) {
-        super(xmlAtomic);
-        iIn = (Port<Input>) super.getInPort(iIn.getName());
-        oOut = (Port<Input>) super.getOutPort(oOut.getName());
-        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
-        Element xmlParameter = (Element)xmlParameters.item(0);
-        processingTime = Double.valueOf(xmlParameter.getAttribute("value"));
-    }
-*/
+
     @Override
     public void initialize() {
         super.passivate();
@@ -95,7 +74,6 @@ public class NodoVirtual extends Atomic {
             	System.out.println("NodoVirtual: " + currentInput.toString());
 
         	}
-        	//currentInput.setSource("fichero");
             super.holdIn("active", processingTime);
         }
     }
@@ -103,7 +81,7 @@ public class NodoVirtual extends Atomic {
     @Override
     public void lambda() {
         oOut.addValue(currentInput);
-        
+        LOGGER.info(this.name + "- Send value to FogServer" + currentInput);
     }
     
 }
