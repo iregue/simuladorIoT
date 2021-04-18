@@ -76,6 +76,7 @@ public class FogServer extends Atomic {
 	double y0 = 0.0;
 	String krigingDate;
 	protected int contadorKriging = 0;
+	boolean outliersProcessed = false;
 // ANSIBLE KRIGINGINIT
 
 	//########################################
@@ -143,20 +144,6 @@ public class FogServer extends Atomic {
         */
       //########################################
     }
-
-    /*
-    public FogServer(Element xmlAtomic) {
-        super(xmlAtomic);
-        iArrived = (Port<Input>) super.getInPort(iArrived.getName());
-        iSolved = (Port<Input>) super.getInPort(iSolved.getName());
-        oOut = (Port<Input>) super.getOutPort(oOut.getName());  
-        NodeList xmlParameters = xmlAtomic.getElementsByTagName("parameter");
-        Element xmlParameter = (Element)xmlParameters.item(0);
-        totalTa = 0;
-        clock = 0;
-        observationTime = Double.valueOf(xmlParameter.getAttribute("value"));
-    }
-	*/
     
     @Override
     public void initialize() {
@@ -172,86 +159,91 @@ public class FogServer extends Atomic {
     public void deltint() {
 
     	List<Input> outliers = new ArrayList<Input>();
-    	//File file = new File("output.txt");
 	    
     	if(contadorArray >= 100) {
 
     		try {
-    			//System.out.println("ListaInputs" + listaInputs.toString());
-            	outliers = getOutliers(listaInputs);
+    			LOGGER.info(this.name + "- Search for Outliers");
+    			outliers = getOutliers(listaInputs);
     			System.out.println("outliers" + outliers.toString());
     			if(outliers.size() > 0) {
-    				try {
-    				double[] x = {0, 1, 2, 3, 4, 5, 6};
-    			    double[] y = {listaInputs.get(listaInputs.size()-6).getRadiacion(), 
-    			    		listaInputs.get(listaInputs.size()-5).getRadiacion(), 
-    			    		listaInputs.get(listaInputs.size()-4).getRadiacion(), 
-    			    		listaInputs.get(listaInputs.size()-3).getRadiacion(), 
-    			    		listaInputs.get(listaInputs.size()-2).getRadiacion(), 
-    			    		listaInputs.get(listaInputs.size()-1).getRadiacion(), 
-    			    		listaInputs.get(listaInputs.size()).getRadiacion()};
-    			    
-    			    double[][] controls = new double[x.length][2];
-    			       for (int i = 0; i < controls.length; i++) {
-    			           controls[i][0] = x[i];
-    			           controls[i][1] = y[i];
-    			       }
-    			       
-    			       CubicSplineInterpolation1D spline = new CubicSplineInterpolation1D(x, y);
-    			       double[][] zz = new double[61][2];
-    			       for (int i = 0; i <= 60; i++) {
-    			           zz[i][0] = i * 0.1;
-    			           zz[i][1] = spline.interpolate(zz[i][0]);
-    			       }
-    			       
-    			       RBFInterpolation1D rbf = new RBFInterpolation1D(x, y, new GaussianRadialBasis());
-    			       double[][] ww = new double[61][2];
-    			       for (int i = 0; i <= 60; i++) {
-    			           ww[i][0] = i * 0.1;
-    			           ww[i][1] = rbf.interpolate(zz[i][0]);
-    			       }
-    			       
-    			       ShepardInterpolation1D shepard = new ShepardInterpolation1D(x, y, 3);
-    			       double[][] vv = new double[61][2];
-    			       for (int i = 0; i <= 60; i++) {
-    			           vv[i][0] = i * 0.1;
-    			           vv[i][1] = shepard.interpolate(zz[i][0]);
-    			       }
-    			       
-    			       
-    			       Input inputCubicSpline = new Input(listaInputs.get(listaInputs.size()).getDate(), zz[30][1], "CubicSpline");
-    			       Input inputRBF = new Input(listaInputs.get(listaInputs.size()).getDate(), ww[30][1], "RBF");
-    			       Input inputShepard = new Input(listaInputs.get(listaInputs.size()).getDate(), vv[30][1], "Shepard");
-
-    			       processInput(inputCubicSpline);
-    			       processInput(inputRBF);
-    			       processInput(inputShepard);
-
-    				}
-    				catch(Exception e) {
-    					System.out.println(e);
-    				}
-    			       
+    				int contadorArray_local = contadorArray;
+    				for(int w = 0; w < outliers.size(); w++) { 
+	    				try {
+	    					int index_outlier = findIndex(listaInputs,outliers.get(w).getRadiacion());
+		    				int first = index_outlier - 3;
+		    				if(first < 0) {first = first + contadorArray_local;}
+		    				int second = index_outlier - 2;
+		    				if(second < 0) {second = second + contadorArray_local;}
+		    				int third = index_outlier - 1;
+		    				if(third < 0) {third = third + contadorArray_local;}
+		    				int fourth = index_outlier + 1;
+		    				if(fourth >= contadorArray_local) {fourth = fourth - contadorArray_local;}
+		    				int fifth = index_outlier + 2;
+		    				if(fifth >= contadorArray_local) {fifth = fifth - contadorArray_local;}
+		    				int sixth = index_outlier + 3;
+		    				if(sixth >= contadorArray_local) {sixth = sixth - contadorArray_local;}
+		    				int seventh = index_outlier + 4;
+		    				if(seventh >= contadorArray_local) {seventh = seventh - contadorArray_local;}
+		    				double[] x = {0, 1, 2, 3, 4, 5, 6};
+		    				double[] y = {listaInputs.get(first).getRadiacion(), 
+	    			    		listaInputs.get(second).getRadiacion(), 
+	    			    		listaInputs.get(third).getRadiacion(), 
+	    			    		listaInputs.get(fourth).getRadiacion(), 
+	    			    		listaInputs.get(fifth).getRadiacion(), 
+	    			    		listaInputs.get(sixth).getRadiacion(), 
+	    			    		listaInputs.get(seventh).getRadiacion()};
+		    			    
+		    			    double[][] controls = new double[x.length][2];
+		    			       for (int i = 0; i < controls.length; i++) {
+		    			           controls[i][0] = x[i];
+		    			           controls[i][1] = y[i];
+		    			       }
+		    			       
+		    			       CubicSplineInterpolation1D spline = new CubicSplineInterpolation1D(x, y);
+		    			       double[][] zz = new double[61][2];
+		    			       for (int i = 0; i <= 60; i++) {
+		    			           zz[i][0] = i * 0.1;
+		    			           zz[i][1] = spline.interpolate(zz[i][0]);
+		    			       }
+		    			       
+		    			       RBFInterpolation1D rbf = new RBFInterpolation1D(x, y, new GaussianRadialBasis());
+		    			       double[][] ww = new double[61][2];
+		    			       for (int i = 0; i <= 60; i++) {
+		    			           ww[i][0] = i * 0.1;
+		    			           ww[i][1] = rbf.interpolate(zz[i][0]);
+		    			       }
+		    			       
+		    			       ShepardInterpolation1D shepard = new ShepardInterpolation1D(x, y, 3);
+		    			       double[][] vv = new double[61][2];
+		    			       for (int i = 0; i <= 60; i++) {
+		    			           vv[i][0] = i * 0.1;
+		    			           vv[i][1] = shepard.interpolate(zz[i][0]);
+		    			       }
+		    			       
+		    			       
+		    			       Input inputCubicSpline = new Input(listaInputs.get(index_outlier).getDate(), zz[30][1], "CubicSpline");
+		    			       Input inputRBF = new Input(listaInputs.get(index_outlier).getDate(), ww[30][1], "RBF");
+		    			       Input inputShepard = new Input(listaInputs.get(index_outlier).getDate(), vv[30][1], "Shepard");
+		
+		    			       replaceOutlier(inputCubicSpline,index_outlier);
+		    			       processInput(inputRBF);
+		    			       processInput(inputShepard);
+	    				}
+	    				catch(Exception e) {
+	    					System.out.println(e);
+	    				}
+    				}   
     			}
-    			/*
-        		FileWriter fr = new FileWriter(file, true);
-        		BufferedWriter br = new BufferedWriter(fr);
-        		PrintWriter pr = new PrintWriter(br);
-            	for (int i = 0; i < outliers.size(); i++) {           		
-            		pr.println(outliers.get(i).toString());
-            	}
-            	pr.println("Sep");
-            	pr.close();
-            	br.close();
-            	fr.close();
-            	*/
-            	listaInputs.clear();
+            	//listaInputs.clear();
             	outliers.clear();
+            	outliersProcessed = true;
     		}
     		catch(Exception e) {
     			e.printStackTrace();
     		}
             contadorPrint++;
+            //contadorArray=0;
         }
         
         super.passivate();
@@ -266,8 +258,6 @@ public class FogServer extends Atomic {
         	//########################################
     		/*
 			currentInputNodovirtual1 = iInNodoVirtual1.getSingleValue();
-    		processInput(currentInputNodovirtual1);
-
 			if(currentInputNodovirtual1 != null) {
             	System.out.println("FogServer: " + currentInputNodovirtual1.toString());
             	processInput(currentInputNodovirtual1);
@@ -276,10 +266,6 @@ public class FogServer extends Atomic {
         	}
 
     		currentInputNodovirtual2 = iInNodoVirtual2.getSingleValue();
-    		processInput(currentInputNodovirtual2);
-    		
-        	
-        	
         	if(currentInputNodovirtual2 != null) {
             	System.out.println("FogServer: " + currentInputNodovirtual2.toString());
             	processInput(currentInputNodovirtual2);
@@ -306,10 +292,11 @@ public class FogServer extends Atomic {
         		try {
         			valor = calculateKriging(x_list, y_list, valores, x0, y0);
             		//System.out.println("VALOR KRINGIN:" + valor );
+        			LOGGER.info(this.name + "- Kriging result: " + valor);
         		}
         		catch(Exception e1) {
         			System.out.println(e1);
-        			
+        			LOGGER.warning(this.name + "- Unable to resolve kriging");
         		}
         		double max = valores.get(0);
         		double min = valores.get(0);
@@ -332,6 +319,7 @@ public class FogServer extends Atomic {
         				valorMedio += valores.get(i);
         			}
         			valorMedio = valorMedio / (valores.size()-1); 
+        			LOGGER.info(this.name + "- Kriging corrected result to: " + valorMedio);
             		krigingInput = new Input(krigingDate, valorMedio, "krigingCorregido");
         		}
         		processInput(krigingInput);
@@ -344,9 +332,11 @@ public class FogServer extends Atomic {
 
     @Override
     public void lambda() {
-    	if(contadorArray >=100) {
+    	if(contadorArray >=100 && outliersProcessed) {
     		oOut.addValues(listaInputs);
+    		listaInputs.clear();
     		contadorArray=0;
+    		outliersProcessed = false;
     	}
     }
     
@@ -378,10 +368,10 @@ public class FogServer extends Atomic {
         }
         //System.out.println("iqr: " + iqr);
 
-        double lowerFence = q1 - 1.5 * iqr;
+        double lowerFence = q1 - 2.5 * iqr;
         //System.out.println("lowerFence: " + lowerFence);
 
-        double upperFence = q3 + 1.5 * iqr;
+        double upperFence = q3 + 2.5 * iqr;
         //System.out.println("upperFence: " + upperFence);
 
         for (int i = 0; i < input.size(); i++) {
@@ -407,6 +397,12 @@ public class FogServer extends Atomic {
         	//System.out.println("Input recibido" + currentInput.toString());
             listaInputs.add(contadorArray,currentInput);
             contadorArray++;
+        }
+    }
+    
+    private void replaceOutlier(Input currentInput, int index) {
+        if(currentInput != null) {
+            listaInputs.add(index,currentInput);
         }
     }
     
@@ -496,4 +492,20 @@ public class FogServer extends Atomic {
         return f0;
     }
     
+    public int findIndex(ArrayList<Input> arr, double value) {
+    	if(arr == null) { return -1;}
+    	
+    	int len = arr.size();
+    	int i = 0;
+    	
+    	while(i < len) {
+    		if(arr.get(i).getRadiacion() == value) {
+    			return i;
+    		}
+    		else {
+    			i++;
+    		}
+    	}
+    	return -1;
+    }
 }
