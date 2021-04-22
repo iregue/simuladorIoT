@@ -59,11 +59,6 @@
     		<version>1.6.1</version>
 		</dependency>
 		<dependency>
-    		<groupId>org.nd4j</groupId>
-    		<artifactId>nd4j-native</artifactId>
-    		<version>0.9.1</version>
-		</dependency>
-		<dependency>
     		<groupId>gov.nist.math</groupId>
     		<artifactId>jama</artifactId>
     		<version>1.0.3</version>
