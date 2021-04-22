@@ -222,9 +222,9 @@ public class FogServer extends Atomic {
 		    			       }
 		    			       
 		    			       
-		    			       Input inputCubicSpline = new Input(listaInputs.get(index_outlier).getDate(), zz[30][1], "CubicSpline");
-		    			       Input inputRBF = new Input(listaInputs.get(index_outlier).getDate(), ww[30][1], "RBF");
-		    			       Input inputShepard = new Input(listaInputs.get(index_outlier).getDate(), vv[30][1], "Shepard");
+		    			       Input inputCubicSpline = new Input(listaInputs.get(index_outlier).getDate(), zz[30][1], "CubicSpline-" + listaInputs.get(index_outlier).getGenerador());
+		    			       Input inputRBF = new Input(listaInputs.get(index_outlier).getDate(), ww[30][1], "RBF-" + listaInputs.get(index_outlier).getGenerador());
+		    			       Input inputShepard = new Input(listaInputs.get(index_outlier).getDate(), vv[30][1], "Shepard-" + listaInputs.get(index_outlier).getGenerador());
 		
 		    			       replaceOutlier(inputCubicSpline,index_outlier);
 		    			       processInput(inputRBF);
